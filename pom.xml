@@ -42,6 +42,12 @@
             <artifactId>spring-boot-starter-data-jpa</artifactId>
             <version>${spring.boot.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+            <version>${spring.boot.version}</version>
+        </dependency>
+
 
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -81,4 +87,13 @@
             <version>3.5.0</version>
         </dependency>
     </dependencies>
+
+
+    <repositories>
+        <repository>
+            <id>Configuration</id>
+            <name>Configuration</name>
+            <url>https://github.com/Nicknameee/Configuration</url>
+        </repository>
+    </repositories>
 </project>

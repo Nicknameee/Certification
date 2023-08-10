@@ -1,0 +1,17 @@
+package io.management.ua.certifications.entity;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.redis.core.RedisHash;
+
+
+@RedisHash("certification")
+@Data
+@NoArgsConstructor
+public class CertificationModel {
+    @Id
+    private String identifier;
+    private String code;
+}
+

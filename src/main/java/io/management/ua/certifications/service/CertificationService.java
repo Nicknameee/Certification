@@ -10,6 +10,8 @@ import io.management.ua.utility.certification.models.CertificationResultModel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
+
 @Service
 @RequiredArgsConstructor
 public class CertificationService {
@@ -26,6 +28,7 @@ public class CertificationService {
         certificationRepository.save(certification);
     }
 
+    @Transactional
     public void certificate(CertificationDTO certificationDTO) {
         Certification certification = certificationRepository.findById(certificationDTO.getIdentifier())
                 .orElseThrow(() -> new RuntimeException(String.format("Certification was not found for identifier: %s", certificationDTO.getIdentifier())));

@@ -9,7 +9,7 @@ import org.springframework.data.redis.core.RedisHash;
 @RedisHash("certification")
 @Data
 @NoArgsConstructor
-public class CertificationModel {
+public class Certification {
     @Id
     private String identifier;
     private String code;

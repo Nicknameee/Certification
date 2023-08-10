@@ -1,6 +1,6 @@
 package io.management.ua.certifications.service;
 
-import io.management.ua.certifications.entity.CertificationModel;
+import io.management.ua.certifications.entity.Certification;
 import io.management.ua.certifications.repository.CertificationRepository;
 import io.management.ua.producers.CertificationResultProducer;
 import io.management.ua.utility.CodeGenerator;
@@ -19,18 +19,18 @@ public class CertificationService {
     public void process(CertificationRequestModel certificationRequestModel) {
         String certificationCode = CodeGenerator.generateCode();
 
-        CertificationModel certificationModel = new CertificationModel();
-        certificationModel.setIdentifier(certificationRequestModel.getIdentifier());
-        certificationModel.setCode(certificationCode);
+        Certification certification = new Certification();
+        certification.setIdentifier(certificationRequestModel.getIdentifier());
+        certification.setCode(certificationCode);
 
-        certificationRepository.save(certificationModel);
+        certificationRepository.save(certification);
     }
 
     public void certificate(CertificationDTO certificationDTO) {
-        CertificationModel certificationModel = certificationRepository.findById(certificationDTO.getIdentifier())
+        Certification certification = certificationRepository.findById(certificationDTO.getIdentifier())
                 .orElseThrow(() -> new RuntimeException(String.format("Certification was not found for identifier: %s", certificationDTO.getIdentifier())));
 
-        if (certificationModel.getCode().equals(certificationDTO.getCode())) {
+        if (certification.getCode().equals(certificationDTO.getCode())) {
             certificationRepository.deleteById(certificationDTO.getIdentifier());
             certificationResultProducer.produce(new CertificationResultModel(certificationDTO.getIdentifier(), true));
         } else {

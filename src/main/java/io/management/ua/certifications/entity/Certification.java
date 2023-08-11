@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 
+import java.time.ZonedDateTime;
 
 @RedisHash("certification")
 @Data
@@ -13,5 +14,5 @@ public class Certification {
     @Id
     private String identifier;
     private String code;
+    private ZonedDateTime issuedAt;
 }
-

@@ -1,7 +1,7 @@
 package io.management.ua.controllers;
 
+import io.management.ua.certifications.dto.CertificationDTO;
 import io.management.ua.certifications.service.CertificationService;
-import io.management.ua.utility.certification.models.CertificationDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

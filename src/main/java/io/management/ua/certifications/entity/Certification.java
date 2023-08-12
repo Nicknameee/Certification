@@ -7,9 +7,9 @@ import org.springframework.data.redis.core.RedisHash;
 
 import java.time.ZonedDateTime;
 
-@RedisHash("certification")
 @Data
 @NoArgsConstructor
+@RedisHash("certification")
 public class Certification {
     @Id
     private String identifier;

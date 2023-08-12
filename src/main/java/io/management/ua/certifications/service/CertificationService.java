@@ -30,7 +30,7 @@ public class CertificationService {
         Certification certification = new Certification();
         certification.setIdentifier(certificationRequestModel.getIdentifier());
         certification.setCode(certificationCode);
-        certification.setIssuedAt(TimeUtil.getCurrentTime());
+        certification.setIssuedAt(TimeUtil.getCurrentDateTime());
 
         certificationRepository.save(certification);
 
@@ -46,7 +46,7 @@ public class CertificationService {
         Certification certification = certificationRepository.findById(certificationDTO.getIdentifier())
                 .orElseThrow(() -> new RuntimeException(String.format("Certification was not found for identifier: %s", certificationDTO.getIdentifier())));
 
-        if (certification.getCode().equals(certificationDTO.getCode()) && certification.getIssuedAt().plusHours(1L).isAfter(TimeUtil.getCurrentTime())) {
+        if (certification.getCode().equals(certificationDTO.getCode()) && certification.getIssuedAt().plusHours(1L).isAfter(TimeUtil.getCurrentDateTime())) {
             certificationRepository.deleteById(certificationDTO.getIdentifier());
             certificationResultProducer.produce(new CertificationResultModel(certificationDTO.getIdentifier(), true));
         } else {
@@ -62,7 +62,7 @@ public class CertificationService {
         Iterable<Certification> certifications = certificationRepository.findAll();
 
         for (Certification certification : certifications) {
-            if (!certification.getIssuedAt().plusHours(1L).isAfter(TimeUtil.getCurrentTime())) {
+            if (!certification.getIssuedAt().plusHours(1L).isAfter(TimeUtil.getCurrentDateTime())) {
                 certificationRepository.deleteById(certification.getIdentifier());
             }
         }

@@ -5,6 +5,6 @@ import org.springframework.http.HttpStatus;
 
 public class CertificationException extends GlobalException {
     public CertificationException(String exception) {
-        super(HttpStatus.CONFLICT, TimeUtil.getCurrentTime(), exception);
+        super(HttpStatus.CONFLICT, TimeUtil.getCurrentDateTime(), exception);
     }
 }

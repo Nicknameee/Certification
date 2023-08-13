@@ -12,8 +12,8 @@ spring:
       value-serializer: io.management.ua.amqp.KafkaValueSerializer
       client-id: id
     consumer:
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       group-id: id
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: io.management.ua.amqp.KafkaValueDeserializer
 
   redis:

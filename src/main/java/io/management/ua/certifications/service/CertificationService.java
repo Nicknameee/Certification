@@ -12,16 +12,22 @@ import io.management.ua.producers.MessageProducer;
 import io.management.ua.utility.CodeGenerator;
 import io.management.ua.utility.TimeUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
 @RequiredArgsConstructor
+@PropertySource("classpath:certification.yml")
 public class CertificationService {
     private final CertificationRepository certificationRepository;
     private final CertificationResultProducer certificationResultProducer;
     private final MessageProducer messageProducer;
+
+    @Value("${settings.validity}")
+    private Long certificationValidity;
 
     @Transactional
     public void process(CertificationRequestModel certificationRequestModel) {
@@ -46,7 +52,11 @@ public class CertificationService {
         Certification certification = certificationRepository.findById(certificationDTO.getIdentifier())
                 .orElseThrow(() -> new RuntimeException(String.format("Certification was not found for identifier: %s", certificationDTO.getIdentifier())));
 
-        if (certification.getCode().equals(certificationDTO.getCode()) && certification.getIssuedAt().plusHours(1L).isAfter(TimeUtil.getCurrentDateTime())) {
+        if (certification.getCode().equals(certificationDTO.getCode())
+                && certification
+                .getIssuedAt()
+                .plusSeconds(certificationValidity)
+                .isAfter(TimeUtil.getCurrentDateTime())) {
             certificationRepository.deleteById(certificationDTO.getIdentifier());
             certificationResultProducer.produce(new CertificationResultModel(certificationDTO.getIdentifier(), true));
         } else {
@@ -62,7 +72,7 @@ public class CertificationService {
         Iterable<Certification> certifications = certificationRepository.findAll();
 
         for (Certification certification : certifications) {
-            if (!certification.getIssuedAt().plusHours(1L).isAfter(TimeUtil.getCurrentDateTime())) {
+            if (TimeUtil.getCurrentDateTime().isAfter(certification.getIssuedAt().plusSeconds(certificationValidity))) {
                 certificationRepository.deleteById(certification.getIdentifier());
             }
         }

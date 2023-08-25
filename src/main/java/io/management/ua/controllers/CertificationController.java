@@ -10,12 +10,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/allowed/v1/certification")
+@RequestMapping("/api/v1/certification")
 @RequiredArgsConstructor
 public class CertificationController {
     private final CertificationService certificationService;
 
-    @PostMapping
+    @PostMapping("/allowed")
     public ResponseEntity<?> certificate(@RequestBody CertificationDTO certificationDTO)  {
         certificationService.certificate(certificationDTO);
         return ResponseEntity.ok().build();

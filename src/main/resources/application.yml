@@ -1,22 +1,4 @@
-server:
-  port: 9003
-
-spring:
-  application:
-    name: CERTIFICATION_SERVICE
-
-  kafka:
-    bootstrap-servers: ${KAFKA_URL}
-    producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: io.management.ua.amqp.KafkaValueSerializer
-      client-id: id
-    consumer:
-      group-id: id
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: io.management.ua.amqp.KafkaValueDeserializer
-
-  redis:
-    host: localhost
-    port: 6379
-    database: 0
+application:
+  properties:
+    certification:
+      validity: 3600

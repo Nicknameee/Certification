@@ -1,8 +1,8 @@
 package io.management.ua.certifications.service;
 
-import io.management.ua.amqp.models.messages.CertificationRequestModel;
-import io.management.ua.amqp.models.messages.CertificationResultModel;
-import io.management.ua.amqp.models.messages.MessageModel;
+import io.management.ua.amqp.messages.CertificationRequestModel;
+import io.management.ua.amqp.messages.CertificationResultModel;
+import io.management.ua.amqp.messages.MessageModel;
 import io.management.ua.certifications.dto.CertificationDTO;
 import io.management.ua.certifications.entity.Certification;
 import io.management.ua.certifications.repository.CertificationRepository;
@@ -13,20 +13,18 @@ import io.management.ua.utility.CodeGenerator;
 import io.management.ua.utility.TimeUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
 @RequiredArgsConstructor
-@PropertySource("classpath:certification.yml")
 public class CertificationService {
     private final CertificationRepository certificationRepository;
     private final CertificationResultProducer certificationResultProducer;
     private final MessageProducer messageProducer;
 
-    @Value("${settings.validity}")
+    @Value("${application.properties.certification.validity}")
     private Long certificationValidity;
 
     @Transactional
@@ -60,7 +58,8 @@ public class CertificationService {
             certificationRepository.deleteById(certificationDTO.getIdentifier());
             certificationResultProducer.produce(new CertificationResultModel(certificationDTO.getIdentifier(), true));
         } else {
-            throw new CertificationException(String.format("Code does not match, identifier: %s", certification.getIdentifier()));
+            throw new CertificationException(String.format("Code does not match, identifier: %s",
+                    certification.getIdentifier()));
         }
     }
 

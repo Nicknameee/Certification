@@ -1,9 +1,7 @@
 package io.management.ua.consumers;
 
-import io.management.ua.amqp.KafkaValueParser;
-import io.management.ua.amqp.models.KafkaTopic;
-import io.management.ua.amqp.models.Message;
-import io.management.ua.amqp.models.messages.CertificationRequestModel;
+import io.management.ua.amqp.KafkaTopic;
+import io.management.ua.amqp.messages.CertificationRequestModel;
 import io.management.ua.certifications.service.CertificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -16,9 +14,7 @@ public class CertificationRequestConsumer {
     private final CertificationService certificationService;
 
     @KafkaListener(topics = KafkaTopic.CERTIFICATION_REQUEST_TOPIC, groupId = KafkaTopic.CERTIFICATION_REQUEST_TOPIC)
-    public void handle(@Payload Message message) {
-        CertificationRequestModel certificationRequestModel = (CertificationRequestModel) KafkaValueParser.parseObject(message);
-
+    public void handle(@Payload CertificationRequestModel certificationRequestModel) {
         certificationService.process(certificationRequestModel);
     }
 }

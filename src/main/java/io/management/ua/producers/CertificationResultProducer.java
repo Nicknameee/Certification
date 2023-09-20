@@ -1,10 +1,9 @@
 package io.management.ua.producers;
 
-import io.management.ua.amqp.KafkaTemplateTool;
-import io.management.ua.amqp.models.KafkaTopic;
-import io.management.ua.amqp.models.Message;
-import io.management.ua.amqp.models.messages.CertificationResultModel;
+import io.management.ua.amqp.KafkaTopic;
+import io.management.ua.amqp.messages.CertificationResultModel;
 import lombok.RequiredArgsConstructor;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
@@ -12,10 +11,10 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class CertificationResultProducer {
-    private final KafkaTemplateTool kafkaTemplate;
+    private final KafkaTemplate<String, CertificationResultModel> kafkaTemplate;
 
     @Retryable(maxAttempts = 100, backoff = @Backoff(delay = 1000L))
     public void produce(CertificationResultModel userApprovalMessage) {
-        kafkaTemplate.send(KafkaTopic.CERTIFICATION_RESPONSE_TOPIC, new Message(userApprovalMessage));
+        kafkaTemplate.send(KafkaTopic.CERTIFICATION_RESPONSE_TOPIC, userApprovalMessage);
     }
 }

@@ -3,13 +3,12 @@ package io.management.ua;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 
-@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
+@SpringBootApplication
 @Slf4j
-public class Main {
+public class Certification {
     public static void main(String[] args) {
         log.debug("Certification service started");
-        SpringApplication.run(Main.class);
+        SpringApplication.run(Certification.class);
     }
 }

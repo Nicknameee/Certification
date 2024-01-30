@@ -1,6 +1,0 @@
-POST {{host}}/api/v1/certification/allowed
-Content-Type: application/json
-
-{
-  "identifier": "id"
-}

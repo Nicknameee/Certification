@@ -6,11 +6,13 @@ import io.management.ua.amqp.messages.MessageModel;
 import io.management.ua.certifications.dto.CertificationDTO;
 import io.management.ua.certifications.entity.Certification;
 import io.management.ua.certifications.repository.CertificationRepository;
+import io.management.ua.exceptions.ActionRestrictedException;
 import io.management.ua.exceptions.CertificationException;
 import io.management.ua.producers.CertificationResultProducer;
 import io.management.ua.producers.MessageProducer;
 import io.management.ua.utility.CodeGenerator;
 import io.management.ua.utility.TimeUtil;
+import io.management.ua.utility.models.HttpServletAddressesModel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -38,9 +40,19 @@ public class CertificationService {
 
         certificationRepository.save(certification);
 
+        HttpServletAddressesModel httpServletAddressesModel = certificationRequestModel.getHttpServletAddressesModel();
+
         MessageModel messageModel = new MessageModel();
         messageModel.setReceiver(certificationRequestModel.getIdentifier());
-        messageModel.setContent(getCertificationMessageContent(certificationCode));
+        messageModel.setSubject("Confirm your action");
+
+        switch (messageModel.getMessageType()) {
+            case HTML -> messageModel.setContent(getCertificationLink(httpServletAddressesModel, getCertificationMessageContent(certificationCode)));
+            case PLAIN_TEXT -> messageModel.setContent(getCertificationMessageContent(certificationCode));
+            case WITH_FILE -> throw new ActionRestrictedException("Media files currently not supported");
+            default -> throw new ActionRestrictedException("Unknown message type or type was not specified");
+        }
+
 
         messageProducer.produce(messageModel);
     }
@@ -65,6 +77,17 @@ public class CertificationService {
 
     private String getCertificationMessageContent(String code) {
         return String.format("Your certification code %s", code);
+    }
+
+    private String getCertificationLink(HttpServletAddressesModel httpServletAddressesModel, String message) {
+        String pattern = "<a href=\"#link?redirectTo=#redirectTarget\">message</a>";
+        String origin = httpServletAddressesModel.getOrigin();
+        String scheme = httpServletAddressesModel.getScheme();
+        String server = httpServletAddressesModel.getServer();
+        String port = String.valueOf(httpServletAddressesModel.getPort());
+        String link = String.format("%s://%s:%s", scheme, server, port);
+
+        return pattern.replaceAll("#link", link).replaceAll("#message", message).replaceAll("#redirectTarget", origin);
     }
 
     public void clearCertificationCache() {

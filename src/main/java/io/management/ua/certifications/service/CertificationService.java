@@ -15,8 +15,11 @@ import io.management.ua.utility.TimeUtil;
 import io.management.ua.utility.models.HttpServletAddressesModel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.net.InetAddress;
 
 
 @Service
@@ -25,6 +28,7 @@ public class CertificationService {
     private final CertificationRepository certificationRepository;
     private final CertificationResultProducer certificationResultProducer;
     private final MessageProducer messageProducer;
+    private final Environment environment;
 
     @Value("${application.properties.certification.validity}")
     private Long certificationValidity;
@@ -44,10 +48,11 @@ public class CertificationService {
 
         MessageModel messageModel = new MessageModel();
         messageModel.setReceiver(certificationRequestModel.getIdentifier());
-        messageModel.setSubject("Confirm your action");
+        messageModel.setSubject("Confirm your action at CRM");
+        messageModel.setMessageType(MessageModel.MessageType.HTML);
 
         switch (messageModel.getMessageType()) {
-            case HTML -> messageModel.setContent(getCertificationLink(httpServletAddressesModel, getCertificationMessageContent(certificationCode)));
+            case HTML -> messageModel.setContent(getCertificationLink(httpServletAddressesModel, getCertificationMessageContent(certificationCode), certificationRequestModel.getIdentifier(), certificationCode));
             case PLAIN_TEXT -> messageModel.setContent(getCertificationMessageContent(certificationCode));
             case WITH_FILE -> throw new ActionRestrictedException("Media files currently not supported");
             default -> throw new ActionRestrictedException("Unknown message type or type was not specified");
@@ -79,15 +84,20 @@ public class CertificationService {
         return String.format("Your certification code %s", code);
     }
 
-    private String getCertificationLink(HttpServletAddressesModel httpServletAddressesModel, String message) {
-        String pattern = "<a href=\"#link?redirectTo=#redirectTarget\">message</a>";
+    private String getCertificationLink(HttpServletAddressesModel httpServletAddressesModel, String message, String identifier, String code) {
+        String pattern = "<a href=\"#link?&identifier=#id&code=#code&origin=#redirectTarget\">#message</a>";
         String origin = httpServletAddressesModel.getOrigin();
-        String scheme = httpServletAddressesModel.getScheme();
-        String server = httpServletAddressesModel.getServer();
-        String port = String.valueOf(httpServletAddressesModel.getPort());
-        String link = String.format("%s://%s:%s", scheme, server, port);
+        String link = String.format("%s://%s:%s/api/v1/certification/mail/allowed",
+                httpServletAddressesModel.getOrigin().split(":")[0],
+                InetAddress.getLoopbackAddress().getHostName(),
+                environment.getProperty("server.port"));
 
-        return pattern.replaceAll("#link", link).replaceAll("#message", message).replaceAll("#redirectTarget", origin);
+        return pattern
+                .replaceAll("#link", link)
+                .replaceAll("#id", identifier)
+                .replaceAll("#code", code)
+                .replaceAll("#message", message)
+                .replaceAll("#redirectTarget", origin);
     }
 
     public void clearCertificationCache() {

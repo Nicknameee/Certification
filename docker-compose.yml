@@ -1,0 +1,26 @@
+version: '3.7'
+
+networks:
+  crm:
+    external: true
+
+services:
+  certification:
+    image: certification:latest
+    container_name: certifications
+    ports:
+      - "9003:9003"
+    environment:
+      - CONFIG_SERVER_LOGIN=user
+      - CONFIG_SERVER_PASSWORD=user
+      - SPRING_PROFILES_ACTIVE=default
+      - CONFIG_SERVER_URI=http://user:user@settings:8888
+      - KAFKA_URL=kafka:9092
+      - UDB_PASSWORD=1904
+      - UDB_URL=jdbc:postgresql://postgres:5432/users
+      - UDB_USERNAME=users_reader
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_DATABASE=0
+    networks:
+      - crm

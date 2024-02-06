@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.net.InetAddress;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 
 @Service
@@ -51,15 +52,21 @@ public class CertificationService {
         MessageModel messageModel = new MessageModel();
         messageModel.setReceiver(certificationRequestModel.getIdentifier());
         messageModel.setSubject("Confirm your action at CRM");
-        messageModel.setMessageType(MessageModel.MessageType.HTML);
 
-        switch (messageModel.getMessageType()) {
-            case HTML -> messageModel.setContent(getCertificationLink(httpServletAddressesModel, getCertificationMessageContent(certificationCode), certificationRequestModel.getIdentifier(), certificationCode));
-            case PLAIN_TEXT -> messageModel.setContent(getCertificationMessageContent(certificationCode));
-            case WITH_FILE -> throw new ActionRestrictedException("Media files currently not supported");
-            default -> throw new ActionRestrictedException("Unknown message type or type was not specified");
+        if (Pattern.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", certificationRequestModel.getIdentifier())) {
+            messageModel.setMessageType(MessageModel.MessageType.HTML);
+
+            switch (messageModel.getMessageType()) {
+                case HTML -> messageModel.setContent(getCertificationLink(httpServletAddressesModel, getCertificationMessageContent(certificationCode), certificationRequestModel.getIdentifier(), certificationCode));
+                case PLAIN_TEXT -> messageModel.setContent(getCertificationMessageContent(certificationCode));
+                case WITH_FILE -> throw new ActionRestrictedException("Media files currently not supported");
+                default -> throw new ActionRestrictedException("Unknown message type or type was not specified");
+            }
+
+            messageModel.setMessagePlatform(MessageModel.MessagePlatform.EMAIL);
+        } else {
+            messageModel.setMessagePlatform(MessageModel.MessagePlatform.TELEGRAM);
         }
-
 
         messageProducer.produce(messageModel);
     }

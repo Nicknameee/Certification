@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 public class MessageProducer {
     private final KafkaTemplate<String, MessageModel> kafkaTemplate;
 
-    @Retryable(maxAttempts = 5, backoff = @Backoff(delay = 300L))
+    @Retryable(maxAttempts = 5, backoff = @Backoff(delay = 1000L))
     public void produce(MessageModel messageModel) {
         kafkaTemplate.send(KafkaTopic.MESSAGE_TOPIC, messageModel);
     }

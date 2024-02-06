@@ -16,10 +16,12 @@ import io.management.ua.utility.models.HttpServletAddressesModel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.net.InetAddress;
+import java.util.concurrent.TimeUnit;
 
 
 @Service
@@ -81,7 +83,7 @@ public class CertificationService {
     }
 
     private String getCertificationMessageContent(String code) {
-        return String.format("Your certification code %s", code);
+        return String.format("Your certification code %s is valid for %sH", code, TimeUnit.SECONDS.toHours(certificationValidity));
     }
 
     private String getCertificationLink(HttpServletAddressesModel httpServletAddressesModel, String message, String identifier, String code) {
@@ -100,6 +102,7 @@ public class CertificationService {
                 .replaceAll("#redirectTarget", origin);
     }
 
+    @Scheduled(fixedRateString = "${application.properties.certification.validity}", timeUnit = TimeUnit.SECONDS)
     public void clearCertificationCache() {
         Iterable<Certification> certifications = certificationRepository.findAll();
 

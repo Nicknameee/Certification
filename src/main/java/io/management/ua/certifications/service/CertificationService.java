@@ -38,7 +38,7 @@ public class CertificationService {
 
     @Transactional
     public void process(CertificationRequestModel certificationRequestModel) {
-        String certificationCode = CodeGenerator.generateCode();
+        String certificationCode = CodeGenerator.generateCode("iiiii-iiiii-iiiii");
 
         Certification certification = new Certification();
         certification.setIdentifier(certificationRequestModel.getIdentifier());
@@ -52,6 +52,9 @@ public class CertificationService {
         MessageModel messageModel = new MessageModel();
         messageModel.setReceiver(certificationRequestModel.getIdentifier());
         messageModel.setSubject("Confirm your action at CRM");
+        messageModel.setSendingDate(TimeUtil.getCurrentDateTime());
+        messageModel.setExpiringDate(TimeUtil.getCurrentDateTime().plusSeconds(certificationValidity));
+
 
         if (Pattern.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", certificationRequestModel.getIdentifier())) {
             messageModel.setMessageType(MessageModel.MessageType.HTML);
@@ -65,6 +68,7 @@ public class CertificationService {
 
             messageModel.setMessagePlatform(MessageModel.MessagePlatform.EMAIL);
         } else {
+            messageModel.setContent(getCertificationTelegramMessageContent(certificationCode));
             messageModel.setMessagePlatform(MessageModel.MessagePlatform.TELEGRAM);
         }
 
@@ -91,6 +95,10 @@ public class CertificationService {
 
     private String getCertificationMessageContent(String code) {
         return String.format("Your certification code %s is valid for %sH", code, TimeUnit.SECONDS.toHours(certificationValidity));
+    }
+
+    private String getCertificationTelegramMessageContent(String code) {
+        return String.format("Your certification code `%s` is valid for %sH", code, TimeUnit.SECONDS.toHours(certificationValidity));
     }
 
     private String getCertificationLink(HttpServletAddressesModel httpServletAddressesModel, String message, String identifier, String code) {

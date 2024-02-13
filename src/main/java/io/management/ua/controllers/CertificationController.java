@@ -2,8 +2,8 @@ package io.management.ua.controllers;
 
 import io.management.ua.certifications.dto.CertificationDTO;
 import io.management.ua.certifications.service.CertificationService;
+import io.management.ua.response.Response;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
 
@@ -24,8 +24,8 @@ public class CertificationController {
     }
 
     @PostMapping("/allowed")
-    public ResponseEntity<?> certificate(@RequestBody CertificationDTO certificationDTO)  {
+    public Response<?> certificate(@RequestBody CertificationDTO certificationDTO)  {
         certificationService.certificate(certificationDTO);
-        return ResponseEntity.ok().build();
+        return Response.ok();
     }
 }

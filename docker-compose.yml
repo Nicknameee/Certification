@@ -16,11 +16,11 @@ services:
       - SPRING_PROFILES_ACTIVE=default
       - CONFIG_SERVER_URI=http://user:user@settings:8888
       - KAFKA_URL=kafka:9092
-      - UDB_PASSWORD=1904
-      - UDB_URL=jdbc:postgresql://postgres:5432/users
-      - UDB_USERNAME=users_reader
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - REDIS_DATABASE=0
+      - USER_READER_DB_PASSWORD=1904
+      - USER_READER_DB_URL=jdbc:postgresql://postgres:5432/users
+      - USER_READER_DB_USERNAME=users_reader
+      - REDIS_HOST_INFRASTRUCTURE=redis
+      - REDIS_PORT_INFRASTRUCTURE=6379
+      - REDIS_DATABASE_INFRASTRUCTURE=0
     networks:
       - crm

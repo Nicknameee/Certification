@@ -13,7 +13,7 @@ services:
     environment:
       - CONFIG_SERVER_LOGIN=user
       - CONFIG_SERVER_PASSWORD=user
-      - SPRING_PROFILES_ACTIVE=default
+      - SPRING_PROFILES_ACTIVE=default,native,dev,elk
       - CONFIG_SERVER_URI=http://user:user@settings:8888
       - KAFKA_URL=kafka:9092
       - USER_READER_DB_PASSWORD=1904

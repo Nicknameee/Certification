@@ -10,7 +10,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @RequiredArgsConstructor
 public class Certification {
     public static void main(String[] args) {
-        log.debug("Certification service started");
         SpringApplication.run(Certification.class);
+        log.debug("Certification service started");
     }
 }

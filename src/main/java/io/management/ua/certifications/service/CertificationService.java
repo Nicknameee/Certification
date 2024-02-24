@@ -14,6 +14,7 @@ import io.management.ua.utility.CodeGenerator;
 import io.management.ua.utility.TimeUtil;
 import io.management.ua.utility.models.HttpServletAddressesModel;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -21,11 +22,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.net.InetAddress;
+import java.time.ZonedDateTime;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
-
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class CertificationService {
     private final CertificationRepository certificationRepository;
@@ -40,10 +42,13 @@ public class CertificationService {
     public void process(CertificationRequestModel certificationRequestModel) {
         String certificationCode = CodeGenerator.generateCode("iiiii-iiiii-iiiii");
 
+        ZonedDateTime issuingTime = TimeUtil.getCurrentDateTime();
+
         Certification certification = new Certification();
         certification.setIdentifier(certificationRequestModel.getIdentifier());
         certification.setCode(certificationCode);
-        certification.setIssuedAt(TimeUtil.getCurrentDateTime());
+        certification.setIssuedAt(issuingTime);
+        certification.setExpiringDate(issuingTime.plusSeconds(certificationValidity));
 
         certificationRepository.save(certification);
 
@@ -52,11 +57,11 @@ public class CertificationService {
         MessageModel messageModel = new MessageModel();
         messageModel.setReceiver(certificationRequestModel.getIdentifier());
         messageModel.setSubject("Confirm your action at CRM");
-        messageModel.setSendingDate(TimeUtil.getCurrentDateTime());
-        messageModel.setExpiringDate(TimeUtil.getCurrentDateTime().plusSeconds(certificationValidity));
+        messageModel.setSendingDate(issuingTime);
+        messageModel.setExpiringDate(issuingTime.plusSeconds(certificationValidity));
 
 
-        if (Pattern.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", certificationRequestModel.getIdentifier())) {
+        if (Pattern.matches(io.management.ua.utility.Pattern.EMAIL, certificationRequestModel.getIdentifier())) {
             messageModel.setMessageType(MessageModel.MessageType.HTML);
 
             switch (messageModel.getMessageType()) {
@@ -67,12 +72,16 @@ public class CertificationService {
             }
 
             messageModel.setMessagePlatform(MessageModel.MessagePlatform.EMAIL);
-        } else {
+
+            messageProducer.produce(messageModel);
+        } else if (Pattern.matches(io.management.ua.utility.Pattern.TELEGRAM_USERNAME, certificationRequestModel.getIdentifier())) {
             messageModel.setContent(getCertificationTelegramMessageContent(certificationCode));
             messageModel.setMessagePlatform(MessageModel.MessagePlatform.TELEGRAM);
-        }
 
-        messageProducer.produce(messageModel);
+            messageProducer.produce(messageModel);
+        } else {
+            log.error("Identifier {} in certification request is unappropriated", certificationRequestModel.getIdentifier());
+        }
     }
 
     @Transactional
@@ -82,10 +91,10 @@ public class CertificationService {
 
         if (certification.getCode().equals(certificationDTO.getCode())
                 && certification
-                .getIssuedAt()
-                .plusSeconds(certificationValidity)
+                .getExpiringDate()
                 .isAfter(TimeUtil.getCurrentDateTime())) {
             certificationRepository.deleteById(certificationDTO.getIdentifier());
+
             certificationResultProducer.produce(new CertificationResultModel(certificationDTO.getIdentifier(), true));
         } else {
             throw new CertificationException(String.format("Code does not match, identifier: %s",

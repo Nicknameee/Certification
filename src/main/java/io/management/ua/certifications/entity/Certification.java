@@ -15,4 +15,5 @@ public class Certification {
     private String identifier;
     private String code;
     private ZonedDateTime issuedAt;
+    private ZonedDateTime expiringDate;
 }

@@ -2,7 +2,7 @@
 FROM maven:3.9.4-amazoncorretto-20-al2023
 
 # Set the working directory in the container
-ENV GITHUB_ACCESS_TOKEN=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
+ENV GITHUB_ACCESS_TOKEN=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
 
 # Copy the pom.xml file to the container
 COPY pom.xml .
@@ -23,4 +23,4 @@ RUN mvn clean install -U
 EXPOSE 9003
 
 # Specify the command to run the application
-CMD ["java" ,"-jar", "target/Certification-LATEST.jar"]
+CMD ["java", "-jar", "target/Certification-LATEST.jar"]

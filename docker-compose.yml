@@ -11,21 +11,36 @@ services:
     ports:
       - "9003:9003"
     environment:
-      - CONFIG_SERVER_LOGIN=user
-      - CONFIG_SERVER_PASSWORD=user
+      # Spring profiles active (elk is for enabling logging to Logstash)
       - SPRING_PROFILES_ACTIVE=default,native,dev,elk
-      - CONFIG_SERVER_URI=http://user:user@settings:8888
+      # Spring Security credentials
+      - SPRING_SECURITY_USER_NAME=user
+      - SPRING_SECURITY_USER_PASSWORD=user
+      # Spring Cloud configuration service host protocol://springSecurityUser:springSecurityPassword@containerName:port
+      - SPRING_CLOUD_CONFIG_URI=http://user:user@settings:8888
+      # Apache Kafka host containerName:port
       - KAFKA_URL=kafka:9092
+      # User information DB (mandatory for correct auth logic)
       - USER_READER_DB_PASSWORD=1904
       - USER_READER_DB_URL=jdbc:postgresql://postgres:5432/users
       - USER_READER_DB_USERNAME=users_reader
+      # User's blacklisted tokens cache
       - REDIS_HOST_INFRASTRUCTURE=redis
       - REDIS_PORT_INFRASTRUCTURE=6379
       - REDIS_DATABASE_INFRASTRUCTURE=0
       - REDIS_PASSWORD_INFRASTRUCTURE=1904
+      # Service's cache
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - REDIS_DATABASE=0
       - REDIS_PASSWORD=1904
+      # Eureka SD host
+      - EUREKA_CLIENT_SERVICE_URL=http://user:user@discovery:8889/eureka
+      # Eureka SD registering instance ID (displayed name)
+      - EUREKA_INSTANCE_ID=Certification
+      # Eureka SD registering host (on which host registered service will be available)
+      - EUREKA_HOSTNAME=host.docker.internal
+      # ELK logs receiver host containerName:port
+      - LOGSTASH_URL=logstash:5000
     networks:
       - crm

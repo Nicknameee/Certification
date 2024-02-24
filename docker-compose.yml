@@ -32,12 +32,12 @@ services:
       # Service's cache
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - REDIS_DATABASE=0
+      - REDIS_DATABASE=3
       - REDIS_PASSWORD=1904
       # Eureka SD host
       - EUREKA_CLIENT_SERVICE_URL=http://user:user@discovery:8889/eureka
       # Eureka SD registering instance ID (displayed name)
-      - EUREKA_INSTANCE_ID=Certification
+      - EUREKA_INSTANCE_ID=Certification:9003
       # Eureka SD registering host (on which host registered service will be available)
       - EUREKA_HOSTNAME=host.docker.internal
       # ELK logs receiver host containerName:port

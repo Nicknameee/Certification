@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: ${SPRING_PROFILES_ACTIVE:default, native, dev}
+    active: ${SPRING_PROFILES_ACTIVE:default, native, dev, elk}
 
 application:
   properties:

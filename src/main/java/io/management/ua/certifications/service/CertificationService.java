@@ -49,6 +49,7 @@ public class CertificationService {
         certification.setCode(certificationCode);
         certification.setIssuedAt(issuingTime);
         certification.setExpiringDate(issuingTime.plusSeconds(certificationValidity));
+        certification.setCertificationAction(certificationRequestModel.getAction());
 
         certificationRepository.save(certification);
 
@@ -95,7 +96,7 @@ public class CertificationService {
                 .isAfter(TimeUtil.getCurrentDateTime())) {
             certificationRepository.deleteById(certificationDTO.getIdentifier());
 
-            certificationResultProducer.produce(new CertificationResultModel(certificationDTO.getIdentifier(), true));
+            certificationResultProducer.produce(new CertificationResultModel(certificationDTO.getIdentifier(), true, certification.getCertificationAction()));
         } else {
             throw new CertificationException(String.format("Code does not match, identifier: %s",
                     certification.getIdentifier()));

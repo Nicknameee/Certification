@@ -1,5 +1,6 @@
 package io.management.ua.certifications.entity;
 
+import io.management.ua.utility.models.CertificationAction;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
@@ -16,4 +17,5 @@ public class Certification {
     private String code;
     private ZonedDateTime issuedAt;
     private ZonedDateTime expiringDate;
+    private CertificationAction certificationAction;
 }

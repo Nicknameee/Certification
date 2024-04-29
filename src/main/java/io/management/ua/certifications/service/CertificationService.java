@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.net.InetAddress;
 import java.time.ZonedDateTime;
@@ -38,7 +37,6 @@ public class CertificationService {
     @Value("${application.properties.certification.validity}")
     private Long certificationValidity;
 
-    @Transactional
     public void process(CertificationRequestModel certificationRequestModel) {
         String certificationCode = CodeGenerator.generateCode("iiiii-iiiii-iiiii");
 
@@ -85,7 +83,6 @@ public class CertificationService {
         }
     }
 
-    @Transactional
     public void certificate(CertificationDTO certificationDTO) {
         Certification certification = certificationRepository.findById(certificationDTO.getIdentifier())
                 .orElseThrow(() -> new RuntimeException(String.format("Certification was not found for identifier: %s", certificationDTO.getIdentifier())));
@@ -104,11 +101,11 @@ public class CertificationService {
     }
 
     private String getCertificationMessageContent(String code) {
-        return String.format("Your certification code %s is valid for %sH", code, TimeUnit.SECONDS.toHours(certificationValidity));
+        return String.format("Your certification code %s is valid for %sM", code, TimeUnit.SECONDS.toMinutes(certificationValidity));
     }
 
     private String getCertificationTelegramMessageContent(String code) {
-        return String.format("Your certification code `%s` is valid for %sH", code, TimeUnit.SECONDS.toHours(certificationValidity));
+        return String.format("Your certification code `%s` is valid for %sM", code, TimeUnit.SECONDS.toMinutes(certificationValidity));
     }
 
     private String getCertificationLink(HttpServletAddressesModel httpServletAddressesModel, String message, String identifier, String code) {

@@ -1,8 +1,11 @@
 spring:
+  application:
+    name: Certification
+
   profiles:
-    active: ${SPRING_PROFILES_ACTIVE:default, native, dev, elk}
+    active: ${SPRING_PROFILES_ACTIVE:default, native, dev}
 
 application:
   properties:
     certification:
-      validity: 3600
+      validity: 600

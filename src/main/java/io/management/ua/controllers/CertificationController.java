@@ -24,6 +24,7 @@ public class CertificationController {
                 .identifier(identifier)
                 .code(code)
                 .build());
+
         return new RedirectView(String.format("%s?verified=true", origin));
     }
 

@@ -1,6 +1,4 @@
 spring:
-  application:
-    name: certification
   cloud:
     config:
-      uri: ${CONFIG_SERVER_URI:http://${CONFIG_SERVER_LOGIN:user}:${CONFIG_SERVER_PASSWORD:user}@localhost:8888}
+      uri: ${SPRING_CLOUD_CONFIG_URI:http://${CONFIG_SERVER_LOGIN:user}:${CONFIG_SERVER_PASSWORD:user}@localhost:8888}

@@ -11,7 +11,7 @@ services:
     ports:
       - "9003:9003"
     environment:
-      # Spring profiles active (elk is for enabling logging to Logstash)
+      # Spring profiles active (ELK is for enabling logging to Logstash)
       - SPRING_PROFILES_ACTIVE=default,native,dev,elk
       # Spring Security credentials
       - SPRING_SECURITY_USER_NAME=user
